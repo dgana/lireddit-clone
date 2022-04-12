@@ -1,13 +1,9 @@
 import React from 'react'
 
-interface registerProps {
-
-}
+interface registerProps {}
 
 export const Register: React.FC<registerProps> = ({}) => {
-	return (
-		<div>Register Page</div>
-	);
+  return <div>Register Page</div>
 }
 
 export default Register
