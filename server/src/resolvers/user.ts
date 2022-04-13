@@ -1,5 +1,5 @@
-import { MyContext } from "../entities/types";
-import { User } from "../entities/User";
+import { MyContext } from '../entities/types'
+import { User } from '../entities/User'
 import {
   Arg,
   Ctx,
@@ -8,36 +8,36 @@ import {
   Mutation,
   ObjectType,
   Query,
-  Resolver,
-} from "type-graphql";
-import argon2 from "argon2";
-import { COOKIE_NAME } from "../constants";
+  Resolver
+} from 'type-graphql'
+import argon2 from 'argon2'
+import { COOKIE_NAME } from '../constants'
 
 @InputType()
 class UsernamePasswordInput {
   @Field()
-  username: string;
+  username: string
 
   @Field()
-  password: string;
+  password: string
 }
 
 @ObjectType()
 class FieldError {
   @Field()
-  field: string;
+  field: string
 
   @Field()
-  message: string;
+  message: string
 }
 
 @ObjectType()
 class UserResponse {
   @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
+  errors?: FieldError[]
 
   @Field(() => User, { nullable: true })
-  user?: User;
+  user?: User
 }
 
 @Resolver()
@@ -45,124 +45,124 @@ export class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { em, req }: MyContext) {
     if (!req.session.userId) {
-      return null;
+      return null
     }
 
-    const user = await em.findOne(User, { id: req.session.userId });
-    return user;
+    const user = await em.findOne(User, { id: req.session.userId })
+    return user
   }
 
   @Mutation(() => UserResponse)
   async register(
-    @Arg("options") options: UsernamePasswordInput,
+    @Arg('options') options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext
   ) {
     if (options.username.length <= 2) {
       return {
         errors: [
           {
-            field: "username",
-            message: "length must be greater than 2",
-          },
-        ],
-      };
+            field: 'username',
+            message: 'length must be greater than 2'
+          }
+        ]
+      }
     }
 
     if (options.password.length <= 3) {
       return {
         errors: [
           {
-            field: "password",
-            message: "length must be greater than 3",
-          },
-        ],
-      };
+            field: 'password',
+            message: 'length must be greater than 3'
+          }
+        ]
+      }
     }
 
-    const hashedPassword = await argon2.hash(options.password);
+    const hashedPassword = await argon2.hash(options.password)
 
     const user = em.create(User, {
       username: options.username,
       password: hashedPassword,
       createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+      updatedAt: new Date()
+    })
 
     try {
-      await em.persistAndFlush(user);
+      await em.persistAndFlush(user)
     } catch (err) {
       // duplicate username error
-      if (err.code === "23505") {
+      if (err.code === '23505') {
         //  err.detail.includes('already exists')
         return {
           errors: [
             {
-              field: "username",
-              message: "username has already been taken",
-            },
-          ],
-        };
+              field: 'username',
+              message: 'username has already been taken'
+            }
+          ]
+        }
       }
     }
 
     // store user id session
     // set cookie in session to keep logged in
-    req.session.userId = user.id;
+    req.session.userId = user.id
 
-    return { user };
+    return { user }
   }
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg("options") options: UsernamePasswordInput,
+    @Arg('options') options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const user = await em.findOne(User, {
-      username: options.username,
-    });
+      username: options.username
+    })
 
     if (!user) {
       return {
         errors: [
           {
-            field: "username",
-            message: "that username does't exist",
-          },
-        ],
-      };
+            field: 'username',
+            message: "that username does't exist"
+          }
+        ]
+      }
     }
 
-    const valid = await argon2.verify(user.password, options.password);
+    const valid = await argon2.verify(user.password, options.password)
     if (!valid) {
       return {
         errors: [
           {
-            field: "password",
-            message: "incorrect password",
-          },
-        ],
-      };
+            field: 'password',
+            message: 'incorrect password'
+          }
+        ]
+      }
     }
 
     // store user id session
     // set cookie in session to keep logged in
-    req.session.userId = user.id;
+    req.session.userId = user.id
 
-    return { user };
+    return { user }
   }
 
   @Mutation(() => Boolean)
   logout(@Ctx() { req, res }: MyContext) {
     return new Promise((resolve) =>
       req.session.destroy((err) => {
-        res.clearCookie(COOKIE_NAME);
+        res.clearCookie(COOKIE_NAME)
         if (err) {
-          resolve(false);
-          return;
+          resolve(false)
+          return
         }
 
-        resolve(true);
+        resolve(true)
       })
-    );
+    )
   }
 }
