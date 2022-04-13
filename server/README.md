@@ -14,3 +14,8 @@
 1. https://forum.freecodecamp.org/t/ts-namespace-global-express-has-no-exported-member-session/436838/10
 2. https://redis.io/docs/getting-started/installation/install-redis-on-mac-os/
 3. https://github.com/redis/node-redis/issues/1756
+
+- Cookie Notes
+
+1. set cookie in app.use same-site=lax and secure=false if used on client with nextjs in `http://localhost:3000`
+2. set cookie in app.use same-site=none and secure=true if used on apollo graphql studio in `https://studio.apollographql.com`

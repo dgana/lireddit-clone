@@ -1,6 +1,5 @@
 import { MikroORM } from "@mikro-orm/core"
 import { __prod__ } from "./constants"
-// import { Post } from "./entities/Post"
 import microConfig from './mikro-orm.config'
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
@@ -39,8 +38,8 @@ const main = async () => {
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24,
 				httpOnly: true,
-				sameSite: 'none', // csrf
-				secure: true // cookie only works in https
+				sameSite: 'lax', // csrf if lax
+				secure: false // cookie only works in https if true
 			},
 			saveUninitialized: false, // create a session by default with no data
 			secret: "qwertypoiuy",
@@ -65,7 +64,7 @@ const main = async () => {
 	apolloServer.applyMiddleware({ 
 		app,
 		cors: {
-			origin: 'http://localhost:3000',
+			origin: ['http://localhost:3000', 'https://studio.apollographql.com'],
       credentials: true,		
 		}
 	})
