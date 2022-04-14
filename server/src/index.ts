@@ -1,6 +1,6 @@
-import { MikroORM } from '@mikro-orm/core'
+import 'reflect-metadata'
+
 import { COOKIE_NAME, __prod__ } from './constants'
-import microConfig from './mikro-orm.config'
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
@@ -11,14 +11,28 @@ import { MyContext } from './entities/types'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 import Redis from 'ioredis'
+import { DataSource } from 'typeorm'
+import { Post } from './entities/Post'
+import { User } from './entities/User'
+
+export const dataSource = async () => {
+  const myDataSource = new DataSource({
+    type: 'postgres',
+    database: 'lireddit',
+    username: 'postgres',
+    password: 'govindajaya',
+    logging: true,
+    synchronize: true,
+    entities: [Post, User]
+  })
+  await myDataSource.initialize()
+  return myDataSource
+}
 
 const main = async () => {
+  await dataSource()
   const RedisStore = connectRedis(session)
   const redis = new Redis()
-
-  await redis.connect().catch(console.error)
-  const orm = await MikroORM.init(microConfig)
-  await orm.getMigrator().up()
 
   const app = express()
 
@@ -53,7 +67,6 @@ const main = async () => {
       validate: false
     }),
     context: ({ req, res }): MyContext => ({
-      em: orm.em,
       req,
       res,
       redis

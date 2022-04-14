@@ -19,3 +19,14 @@
 
 1. set cookie in app.use same-site=lax and secure=false if used on client with nextjs in `http://localhost:3000`
 2. set cookie in app.use same-site=none and secure=true if used on apollo graphql studio in `https://studio.apollographql.com`
+
+- Postgres Notes
+
+1. brew install postgresql
+2. psql -U postgres
+3. insert password for user postgres
+4. brew services start postgresql
+5. brew services restart postgresql
+6. brew services stop postgresql
+7. createdb -h localhost -p 5432 -U postgres [dbname]
+8. https://stackoverflow.com/questions/30641512/create-database-from-command-line
