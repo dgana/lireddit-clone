@@ -10,13 +10,13 @@ import { UserResolver } from './resolvers/user'
 import { MyContext } from './entities/types'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
-import { createClient } from 'redis'
-
-const RedisStore = connectRedis(session)
-const redisClient = createClient({ legacyMode: true })
+import Redis from 'ioredis'
 
 const main = async () => {
-  await redisClient.connect().catch(console.error)
+  const RedisStore = connectRedis(session)
+  const redis = new Redis()
+
+  await redis.connect().catch(console.error)
   const orm = await MikroORM.init(microConfig)
   await orm.getMigrator().up()
 
@@ -32,7 +32,7 @@ const main = async () => {
     session({
       name: COOKIE_NAME,
       store: new RedisStore({
-        client: redisClient,
+        client: redis,
         disableTouch: true
       }),
       cookie: {
@@ -55,7 +55,8 @@ const main = async () => {
     context: ({ req, res }): MyContext => ({
       em: orm.em,
       req,
-      res
+      res,
+      redis
     })
   })
 
