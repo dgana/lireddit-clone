@@ -30,3 +30,7 @@
 6. brew services stop postgresql
 7. createdb -h localhost -p 5432 -U postgres [dbname]
 8. https://stackoverflow.com/questions/30641512/create-database-from-command-line
+
+- Mock Data Notes
+
+1. use mockaroo for mock data https://mockaroo.com/

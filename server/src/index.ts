@@ -14,6 +14,7 @@ import Redis from 'ioredis'
 import { DataSource } from 'typeorm'
 import { Post } from './entities/Post'
 import { User } from './entities/User'
+import path from 'path'
 
 export const dataSource = async () => {
   const myDataSource = new DataSource({
@@ -23,9 +24,11 @@ export const dataSource = async () => {
     password: 'govindajaya',
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname, './migrations/*')],
     entities: [Post, User]
   })
   await myDataSource.initialize()
+  await myDataSource.runMigrations()
   return myDataSource
 }
 
