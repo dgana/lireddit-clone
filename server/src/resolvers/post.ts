@@ -16,6 +16,7 @@ import {
 import { MyContext } from '../entities/types'
 import { isAuth } from '../middleware/isAuth'
 import { dataSource } from '..'
+import { Updoot } from '../entities/Updoot'
 
 @InputType()
 class PostInput {
@@ -53,21 +54,57 @@ export class PostResolver {
     const realValue = isUpdoot ? 1 : -1
     const { userId } = req.session
 
+    const updoot = await Updoot.findOne({ where: { postId, userId } })
+
     const ds = await dataSource()
-    await ds.query(
-      `
-			START TRANSACTION;
 
-			insert into updoot ("userId", "postId", value)
-			values (${userId},${postId},${realValue});
+    // the user has voted on the post before
+    // and they are changing the value
+    if (updoot && updoot.value !== realValue) {
+      await ds.transaction(async (tm) => {
+        await tm.query(
+          `
+					update updoot
+					set value = $1
+					where "postId" = $2 and "userId" = $3
 
-			update post
-			set points = points + ${realValue}
-			where id = ${postId};
-			 
-			COMMIT;
-		`
-    )
+				`,
+          [realValue, postId, userId]
+        )
+
+        await tm.query(
+          `
+					update post
+					set points = points + $1
+					where id = $2
+
+				`,
+          [2 * realValue, postId]
+        )
+      })
+    } else if (!updoot) {
+      // has never voted before
+      await ds.transaction(async (tm) => {
+        await tm.query(
+          `
+					insert into updoot ("userId", "postId", value)
+					values ($1,$2,$3);
+
+				`,
+          [userId, postId, realValue]
+        )
+
+        await tm.query(
+          `
+					update post
+					set points = points + $1
+					where id = $2
+
+				`,
+          [realValue, postId]
+        )
+      })
+    }
     return true
   }
 
