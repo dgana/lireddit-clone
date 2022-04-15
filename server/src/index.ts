@@ -15,6 +15,7 @@ import { DataSource } from 'typeorm'
 import { Post } from './entities/Post'
 import { User } from './entities/User'
 import path from 'path'
+import { Updoot } from './entities/Updoot'
 
 export const dataSource = async () => {
   const myDataSource = new DataSource({
@@ -25,7 +26,7 @@ export const dataSource = async () => {
     logging: true,
     synchronize: true,
     migrations: [path.join(__dirname, './migrations/*')],
-    entities: [Post, User]
+    entities: [Post, User, Updoot]
   })
   await myDataSource.initialize()
 
