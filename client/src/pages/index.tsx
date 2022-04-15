@@ -6,7 +6,11 @@ import Link from 'next/link'
 import { Box, Link as ChakraLink } from '@chakra-ui/react'
 
 const Index = () => {
-  const [{ data }] = usePostsQuery()
+  const [{ data }] = usePostsQuery({
+    variables: {
+      limit: 10
+    }
+  })
   return (
     <Layout>
       <Box mb={5}>
