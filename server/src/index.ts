@@ -28,7 +28,9 @@ export const dataSource = async () => {
     entities: [Post, User]
   })
   await myDataSource.initialize()
+
   await myDataSource.runMigrations()
+
   return myDataSource
 }
 
