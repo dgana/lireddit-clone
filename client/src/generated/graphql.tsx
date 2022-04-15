@@ -93,6 +93,7 @@ export type Post = {
   textSnippet: Scalars['String']
   title: Scalars['String']
   updatedAt: Scalars['String']
+  voteStatus?: Maybe<Scalars['Int']>
 }
 
 export type PostInput = {
@@ -145,6 +146,7 @@ export type PostSnippetFragment = {
   updatedAt: string
   title: string
   textSnippet: string
+  voteStatus?: number | null
   points: number
   creator: { __typename?: 'User'; id: number; username: string }
 }
@@ -286,6 +288,7 @@ export type PostsQuery = {
       updatedAt: string
       title: string
       textSnippet: string
+      voteStatus?: number | null
       points: number
       creator: { __typename?: 'User'; id: number; username: string }
     }>
@@ -299,6 +302,7 @@ export const PostSnippetFragmentDoc = gql`
     updatedAt
     title
     textSnippet
+    voteStatus
     points
     creator {
       id
