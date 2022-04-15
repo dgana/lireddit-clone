@@ -160,7 +160,7 @@ export class PostResolver {
   }
 
   @Query(() => Post, { nullable: true })
-  async post(@Arg('id') id: number): Promise<Post | null> {
+  async post(@Arg('id', () => Int) id: number): Promise<Post | null> {
     return Post.findOne({
       where: { id },
       relations: { creator: true }

@@ -1,8 +1,9 @@
-import { Box, Button, Flex, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
 import Link from 'next/link'
 import React from 'react'
 import { MeQuery, useLogoutMutation, useMeQuery } from '../generated/graphql'
 import { isServer } from '../utils/isServer'
+import { Link as ChakraLink } from '@chakra-ui/react'
 
 export const NavBar: React.FC = () => {
   return (
@@ -30,9 +31,11 @@ const NavBarContent: React.FC = () => {
   }
 
   return (
-    <Flex justify="space-between">
+    <Flex maxW={800} m="auto" justify="space-between">
       <Text fontWeight={600} mr={2}>
-        <Link href="/">Home</Link>
+        <Link href="/">
+          <Heading>LiReddit</Heading>
+        </Link>
       </Text>
       <RightBar data={data} />
     </Flex>
@@ -48,8 +51,11 @@ const RightBar: React.FC<RightBar> = ({ data }) => {
 
   if (data?.me?.username) {
     return (
-      <Flex>
-        <Text fontWeight={600} color="white" mr={2}>
+      <Flex align="center">
+        <ChakraLink as={Link} href="/create-post">
+          Create Post
+        </ChakraLink>
+        <Text mx={4} fontWeight={600} color="white">
           {data.me.username}
         </Text>
         <Button

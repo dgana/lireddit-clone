@@ -27,12 +27,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex justify="space-between" align="center" mb={5}>
-        <Heading>LiReddit</Heading>
-        <ChakraLink as={Link} href="/create-post">
-          Create Post
-        </ChakraLink>
-      </Flex>
       {!data && fetching ? (
         <div>loading...</div>
       ) : (
@@ -41,7 +35,9 @@ const Index = () => {
             <Flex key={p.id} w="100%" p={5} shadow="md" borderWidth="1px">
               <UpdootSection post={p} />
               <Box>
-                <Heading fontSize="xl">{p.title}</Heading>
+                <ChakraLink href={`/post/${p.id}`} as={Link}>
+                  <Heading fontSize="xl">{p.title}</Heading>
+                </ChakraLink>
                 <Text mt={4}>posted by {p.creator.username}</Text>
                 <Text mt={4}>{p.textSnippet}</Text>
               </Box>
