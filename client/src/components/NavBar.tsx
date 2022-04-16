@@ -23,21 +23,17 @@ export const NavBar: React.FC = () => {
 }
 
 const NavBarContent: React.FC = () => {
-  const [{ data, fetching }] = useMeQuery({
-    pause: isServer()
+  const { data } = useMeQuery({
+    skip: isServer()
   })
-
-  if (fetching) {
-    return <Text color="white">Loading...</Text>
-  }
 
   return (
     <Flex maxW={800} m="auto" justify="space-between">
-      <Text fontWeight={600} mr={2}>
+      <Box fontWeight={600} mr={2}>
         <Link href="/">
           <Heading>LiReddit</Heading>
         </Link>
-      </Text>
+      </Box>
       <RightBar data={data} />
     </Flex>
   )
@@ -49,7 +45,7 @@ interface RightBar {
 
 const RightBar: React.FC<RightBar> = ({ data }) => {
   const router = useRouter()
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation()
+  const [logout, { loading: logoutFetching }] = useLogoutMutation()
 
   if (data?.me?.username) {
     return (
@@ -78,10 +74,10 @@ const RightBar: React.FC<RightBar> = ({ data }) => {
   return (
     <Flex align="center">
       <Text ml="auto" fontWeight={600} mr={2}>
-        <Link href="login">Login</Link>
+        <Link href="/login">Login</Link>
       </Text>
       <Text fontWeight={600} mr={2}>
-        <Link href="register">Register</Link>
+        <Link href="/register">Register</Link>
       </Text>
     </Flex>
   )

@@ -8,9 +8,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import { withUrqlClient } from 'next-urql'
 import Link from 'next/link'
-import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { UpdootSection } from '../components/UpdootSection'
 import {
@@ -18,17 +16,20 @@ import {
   useMeQuery,
   usePostsQuery
 } from '../generated/graphql'
-import { createUrqlClient } from '../utils/createUrqlClient'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 
 const Index = () => {
-  const [variables, setVariables] = useState({ limit: 15, cursor: null })
-  const [{ data, error, fetching }] = usePostsQuery({
-    variables
+  const { data, error, loading, fetchMore, variables } = usePostsQuery({
+    variables: {
+      limit: 15,
+      cursor: null
+    },
+    notifyOnNetworkStatusChange: true
   })
-  const [, deletePost] = useDeletePostMutation()
-  const [{ data: meData }] = useMeQuery()
-  if (!fetching && !data) {
+  const [deletePost] = useDeletePostMutation()
+  const { data: meData } = useMeQuery()
+
+  if (!loading && !data) {
     return (
       <Box>
         <div>you got query failed for some reason</div>
@@ -39,7 +40,7 @@ const Index = () => {
 
   return (
     <Layout>
-      {!data && fetching ? (
+      {!data && loading ? (
         <div>loading...</div>
       ) : (
         <VStack spacing={4}>
@@ -61,7 +62,7 @@ const Index = () => {
                         mr={2}
                         icon={<DeleteIcon />}
                         aria-label={'Delete Post'}
-                        onClick={() => deletePost({ id: p.id })}
+                        onClick={() => deletePost({ variables: { id: p.id } })}
                       ></IconButton>
                       <ChakraLink as={Link} href={`/post/edit/${p.id}`}>
                         <IconButton
@@ -81,11 +82,15 @@ const Index = () => {
         <Flex my={6} justify="center">
           <Button
             onClick={() => {
-              setVariables({
-                limit: variables.limit,
-                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  cursor:
+                    data.posts.posts[data.posts.posts.length - 1].createdAt
+                }
               })
             }}
+            isLoading={loading}
             w="100%"
             colorScheme="gray"
           >
@@ -97,4 +102,4 @@ const Index = () => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index)
+export default Index

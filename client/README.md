@@ -42,3 +42,7 @@ If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl
 
 1. an exchange for all errors: https://github.com/FormidableLabs/urql/issues/225#issuecomment-482592203
 2. ssr attach cookie https://www.rasikag.com/posts/creating-a-reddit-clone-using-react-and-graphql-19
+
+### CodeGen ENV
+
+1. https://github.com/benawad/gen-env-types

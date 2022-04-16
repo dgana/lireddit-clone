@@ -1,6 +1,4 @@
-import { withUrqlClient } from 'next-urql'
 import { Layout } from '../../components/Layout'
-import { createUrqlClient } from '../../utils/createUrqlClient'
 import { Box, Flex, Heading, IconButton, Link, Text } from '@chakra-ui/react'
 import { useGetPostFromUrl } from '../../utils/useGetPostFromUrl'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
@@ -9,11 +7,11 @@ import { Link as ChakraLink } from '@chakra-ui/react'
 import Router from 'next/router'
 
 export const Post = () => {
-  const [{ data, fetching }] = useGetPostFromUrl()
-  const [, deletePost] = useDeletePostMutation()
-  const [{ data: meData }] = useMeQuery()
+  const { data, loading } = useGetPostFromUrl()
+  const [deletePost] = useDeletePostMutation()
+  const { data: meData } = useMeQuery()
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <div>loading...</div>
@@ -42,7 +40,7 @@ export const Post = () => {
                 aria-label={'Delete Post'}
                 onClick={() => {
                   Router.back()
-                  deletePost({ id: data?.post?.id })
+                  deletePost({ variables: { id: data?.post?.id } })
                 }}
               ></IconButton>
               <ChakraLink as={Link} href={`/post/edit/${data?.post?.id}`}>
@@ -60,4 +58,4 @@ export const Post = () => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post)
+export default Post
