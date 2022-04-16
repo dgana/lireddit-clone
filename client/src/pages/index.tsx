@@ -23,13 +23,18 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 15, cursor: null })
-  const [{ data, fetching }] = usePostsQuery({
+  const [{ data, error, fetching }] = usePostsQuery({
     variables
   })
   const [, deletePost] = useDeletePostMutation()
   const [{ data: meData }] = useMeQuery()
   if (!fetching && !data) {
-    return <Box>you got query failed for some reason</Box>
+    return (
+      <Box>
+        <div>you got query failed for some reason</div>
+        <div>{error.message}</div>
+      </Box>
+    )
   }
 
   return (
