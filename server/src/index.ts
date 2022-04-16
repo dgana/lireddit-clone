@@ -17,6 +17,7 @@ import { User } from './entities/User'
 import path from 'path'
 import { Updoot } from './entities/Updoot'
 import { createUserLoader } from './utils/createUserLoader'
+import { createUpdootLoader } from './utils/createUpdootLoader'
 
 export const dataSource = async () => {
   const myDataSource = new DataSource({
@@ -77,7 +78,8 @@ const main = async () => {
       req,
       res,
       redis,
-      userLoader: createUserLoader()
+      userLoader: createUserLoader(),
+      updootLoader: createUpdootLoader()
     })
   })
 

@@ -54,7 +54,7 @@ const Index = () => {
                   <Text mt={4}>posted by {p.creator.username}</Text>
                   <Text mt={4}>{p.textSnippet}</Text>
                 </Box>
-                {meData?.me.id === p.creator.id && (
+                {meData?.me?.id === p.creator.id && (
                   <Flex justify="flex-end" align="flex-end">
                     <Box>
                       <IconButton

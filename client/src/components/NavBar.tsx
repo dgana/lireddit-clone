@@ -71,13 +71,13 @@ const RightBar: React.FC<RightBar> = ({ data }) => {
   }
 
   return (
-    <>
+    <Flex align="center">
       <Text ml="auto" fontWeight={600} mr={2}>
         <Link href="login">Login</Link>
       </Text>
       <Text fontWeight={600} mr={2}>
         <Link href="register">Register</Link>
       </Text>
-    </>
+    </Flex>
   )
 }
