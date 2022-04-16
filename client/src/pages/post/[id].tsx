@@ -5,6 +5,7 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { useDeletePostMutation, useMeQuery } from '../../generated/graphql'
 import { Link as ChakraLink } from '@chakra-ui/react'
 import Router from 'next/router'
+import withApollo from '../../utils/withApollo'
 
 export const Post = () => {
   const { data, loading } = useGetPostFromUrl()
@@ -58,4 +59,4 @@ export const Post = () => {
   )
 }
 
-export default Post
+export default withApollo({ ssr: true })(Post)

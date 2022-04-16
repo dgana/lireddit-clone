@@ -6,6 +6,7 @@ import { Button } from '@chakra-ui/react'
 import { useRegisterMutation } from '../generated/graphql'
 import { toErrorMap } from '../utils/toErrorMap'
 import { useRouter } from 'next/router'
+import withApollo from '../utils/withApollo'
 
 const Register: React.FC = () => {
   const router = useRouter()
@@ -52,4 +53,4 @@ const Register: React.FC = () => {
   )
 }
 
-export default Register
+export default withApollo({ ssr: false })(Register)

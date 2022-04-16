@@ -8,6 +8,7 @@ import { useChangePasswordMutation } from '../../generated/graphql'
 import { toErrorMap } from '../../utils/toErrorMap'
 import { useState } from 'react'
 import Link from 'next/link'
+import withApollo from '../../utils/withApollo'
 
 export const ChangePassword: NextPage = () => {
   const router = useRouter()
@@ -68,4 +69,4 @@ export const ChangePassword: NextPage = () => {
   )
 }
 
-export default ChangePassword
+export default withApollo({ ssr: false })(ChangePassword)
