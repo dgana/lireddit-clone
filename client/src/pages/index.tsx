@@ -3,6 +3,7 @@ import {
   Button,
   Flex,
   Heading,
+  IconButton,
   Link as ChakraLink,
   Text,
   VStack
@@ -12,14 +13,16 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { UpdootSection } from '../components/UpdootSection'
-import { usePostsQuery } from '../generated/graphql'
+import { useDeletePostMutation, usePostsQuery } from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
+import { DeleteIcon } from '@chakra-ui/icons'
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 15, cursor: null })
   const [{ data, fetching }] = usePostsQuery({
     variables
   })
+  const [, deletePost] = useDeletePostMutation()
 
   if (!fetching && !data) {
     return <Box>you got query failed for some reason</Box>
@@ -31,18 +34,29 @@ const Index = () => {
         <div>loading...</div>
       ) : (
         <VStack spacing={4}>
-          {data.posts.posts.map((p) => (
-            <Flex key={p.id} w="100%" p={5} shadow="md" borderWidth="1px">
-              <UpdootSection post={p} />
-              <Box>
-                <ChakraLink href={`/post/${p.id}`} as={Link}>
-                  <Heading fontSize="xl">{p.title}</Heading>
-                </ChakraLink>
-                <Text mt={4}>posted by {p.creator.username}</Text>
-                <Text mt={4}>{p.textSnippet}</Text>
-              </Box>
-            </Flex>
-          ))}
+          {data.posts.posts.map((p) =>
+            !p ? null : (
+              <Flex key={p.id} w="100%" p={5} shadow="md" borderWidth="1px">
+                <UpdootSection post={p} />
+                <Box flex={1}>
+                  <ChakraLink href={`/post/${p.id}`} as={Link}>
+                    <Heading fontSize="xl">{p.title}</Heading>
+                  </ChakraLink>
+                  <Text mt={4}>posted by {p.creator.username}</Text>
+                  <Text mt={4}>{p.textSnippet}</Text>
+                  <Flex>
+                    <IconButton
+                      ml="auto"
+                      icon={<DeleteIcon />}
+                      aria-label={'Delete Post'}
+                      colorScheme="red"
+                      onClick={() => deletePost({ id: p.id })}
+                    ></IconButton>
+                  </Flex>
+                </Box>
+              </Flex>
+            )
+          )}
         </VStack>
       )}
       {data && data.posts.hasMore ? (
