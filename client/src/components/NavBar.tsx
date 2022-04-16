@@ -4,6 +4,7 @@ import React from 'react'
 import { MeQuery, useLogoutMutation, useMeQuery } from '../generated/graphql'
 import { isServer } from '../utils/isServer'
 import { Link as ChakraLink } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 
 export const NavBar: React.FC = () => {
   return (
@@ -47,6 +48,7 @@ interface RightBar {
 }
 
 const RightBar: React.FC<RightBar> = ({ data }) => {
+  const router = useRouter()
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation()
 
   if (data?.me?.username) {
@@ -59,7 +61,10 @@ const RightBar: React.FC<RightBar> = ({ data }) => {
           {data.me.username}
         </Text>
         <Button
-          onClick={() => logout()}
+          onClick={async () => {
+            await logout()
+            router.reload()
+          }}
           color="white"
           isLoading={logoutFetching}
           variant="link"

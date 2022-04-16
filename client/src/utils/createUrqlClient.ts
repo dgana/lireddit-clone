@@ -1,4 +1,4 @@
-import { cacheExchange, Resolver } from '@urql/exchange-graphcache'
+import { cacheExchange, Resolver, Cache } from '@urql/exchange-graphcache'
 import {
   dedupExchange,
   Exchange,
@@ -74,6 +74,14 @@ export const cursorPagination = (): Resolver => {
   }
 }
 
+function invalidateAllPosts(cache: Cache) {
+  const allFields = cache.inspectFields('Query')
+  const fieldInfos = allFields.filter((info) => info.fieldName === 'posts')
+  fieldInfos.forEach((fi) => {
+    cache.invalidate('Query', 'posts', fi.arguments)
+  })
+}
+
 export const createUrqlClient = (ssrExchange: any, ctx: any) => {
   // add context as parameter above
   // then set the cookie value
@@ -141,13 +149,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
             },
 
             CreatePost: (_result, args, cache, info) => {
-              const allFields = cache.inspectFields('Query')
-              const fieldInfos = allFields.filter(
-                (info) => info.fieldName === 'posts'
-              )
-              fieldInfos.forEach((fi) => {
-                cache.invalidate('Query', 'posts', fi.arguments)
-              })
+              invalidateAllPosts(cache)
             },
 
             login: (_result, args, cache, info) => {
@@ -165,6 +167,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                   }
                 }
               )
+              invalidateAllPosts(cache)
             },
 
             register: (_result, args, cache, info) => {
