@@ -1,20 +1,17 @@
 import { withUrqlClient } from 'next-urql'
-import { useRouter } from 'next/router'
 import { Layout } from '../../components/Layout'
-import { usePostQuery } from '../../generated/graphql'
 import { createUrqlClient } from '../../utils/createUrqlClient'
-import { Heading, Text } from '@chakra-ui/react'
+import { Box, Flex, Heading, IconButton, Link, Text } from '@chakra-ui/react'
+import { useGetPostFromUrl } from '../../utils/useGetPostFromUrl'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { useDeletePostMutation, useMeQuery } from '../../generated/graphql'
+import { Link as ChakraLink } from '@chakra-ui/react'
+import Router from 'next/router'
 
 export const Post = () => {
-  const router = useRouter()
-  const intId =
-    typeof router.query.id === 'string' ? parseInt(router.query.id) : -1
-  const [{ data, fetching }] = usePostQuery({
-    pause: intId === -1,
-    variables: {
-      postId: intId
-    }
-  })
+  const [{ data, fetching }] = useGetPostFromUrl()
+  const [, deletePost] = useDeletePostMutation()
+  const [{ data: meData }] = useMeQuery()
 
   if (fetching) {
     return (
@@ -34,7 +31,30 @@ export const Post = () => {
 
   return (
     <Layout>
-      <Heading mb={4}>{data?.post?.title}</Heading>
+      <Flex justify="space-between" align="center">
+        <Heading mb={4}>{data?.post?.title}</Heading>
+        {meData?.me.id === data?.post?.creator.id && (
+          <Flex justify="flex-end" align="flex-end">
+            <Box>
+              <IconButton
+                mr={2}
+                icon={<DeleteIcon />}
+                aria-label={'Delete Post'}
+                onClick={() => {
+                  Router.back()
+                  deletePost({ id: data?.post?.id })
+                }}
+              ></IconButton>
+              <ChakraLink as={Link} href={`/post/edit/${data?.post?.id}`}>
+                <IconButton
+                  icon={<EditIcon />}
+                  aria-label={'Edit Post'}
+                ></IconButton>
+              </ChakraLink>
+            </Box>
+          </Flex>
+        )}
+      </Flex>
       <Text>{data?.post?.text}</Text>
     </Layout>
   )

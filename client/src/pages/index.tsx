@@ -13,9 +13,13 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { UpdootSection } from '../components/UpdootSection'
-import { useDeletePostMutation, usePostsQuery } from '../generated/graphql'
+import {
+  useDeletePostMutation,
+  useMeQuery,
+  usePostsQuery
+} from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
-import { DeleteIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 15, cursor: null })
@@ -23,7 +27,7 @@ const Index = () => {
     variables
   })
   const [, deletePost] = useDeletePostMutation()
-
+  const [{ data: meData }] = useMeQuery()
   if (!fetching && !data) {
     return <Box>you got query failed for some reason</Box>
   }
@@ -44,16 +48,25 @@ const Index = () => {
                   </ChakraLink>
                   <Text mt={4}>posted by {p.creator.username}</Text>
                   <Text mt={4}>{p.textSnippet}</Text>
-                  <Flex>
-                    <IconButton
-                      ml="auto"
-                      icon={<DeleteIcon />}
-                      aria-label={'Delete Post'}
-                      colorScheme="red"
-                      onClick={() => deletePost({ id: p.id })}
-                    ></IconButton>
-                  </Flex>
                 </Box>
+                {meData?.me.id === p.creator.id && (
+                  <Flex justify="flex-end" align="flex-end">
+                    <Box>
+                      <IconButton
+                        mr={2}
+                        icon={<DeleteIcon />}
+                        aria-label={'Delete Post'}
+                        onClick={() => deletePost({ id: p.id })}
+                      ></IconButton>
+                      <ChakraLink as={Link} href={`/post/edit/${p.id}`}>
+                        <IconButton
+                          icon={<EditIcon />}
+                          aria-label={'Edit Post'}
+                        ></IconButton>
+                      </ChakraLink>
+                    </Box>
+                  </Flex>
+                )}
               </Flex>
             )
           )}
