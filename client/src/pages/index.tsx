@@ -62,7 +62,14 @@ const Index = () => {
                         mr={2}
                         icon={<DeleteIcon />}
                         aria-label={'Delete Post'}
-                        onClick={() => deletePost({ variables: { id: p.id } })}
+                        onClick={() =>
+                          deletePost({
+                            variables: { id: p.id },
+                            update: (cache) => {
+                              cache.evict({ id: 'Post:' + p.id })
+                            }
+                          })
+                        }
                       ></IconButton>
                       <ChakraLink as={Link} href={`/post/edit/${p.id}`}>
                         <IconButton
